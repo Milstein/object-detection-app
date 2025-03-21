@@ -1,5 +1,5 @@
 # Dockerfile
-FROM python:3.9-slim
+FROM quay.io/fedora/python-310
 
 # Set working directory
 WORKDIR /app
