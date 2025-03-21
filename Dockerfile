@@ -13,7 +13,7 @@ COPY --chown=1001:0 requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt && \
     rm -f requirements.txt
 
-COPY --chown=1001:0 app.py coco.yaml remote_infer_grpc.py ./
+COPY --chown=1001:0 app.py coco.yaml remote_infer_rest.py ./
 
 # Expose Streamlit port
 EXPOSE 8501
