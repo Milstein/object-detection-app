@@ -1,5 +1,11 @@
 streamlit
-opencv-python
+opencv-python-headless  # Replaces opencv-python to avoid GUI dependencies in Docker
 matplotlib
 pillow
 numpy
+torch
+torchvision
+grpcio
+grpcio-tools
+pyyaml
+requests
