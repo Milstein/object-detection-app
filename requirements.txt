@@ -5,7 +5,8 @@ pillow
 numpy
 torch
 torchvision
-grpcio
-grpcio-tools
+# grpcio
+# grpcio-tools
 pyyaml
 requests
+seaborn
