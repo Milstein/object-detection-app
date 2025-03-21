@@ -3,8 +3,8 @@ opencv-python-headless  # Replaces opencv-python to avoid GUI dependencies in Do
 matplotlib
 pillow
 numpy
-torch==2.0.1+cu118
-torchvision==0.15.2+cu118
+torch
+torchvision
 # grpcio
 # grpcio-tools
 pyyaml
