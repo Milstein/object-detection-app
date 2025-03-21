@@ -28,7 +28,8 @@ RUN pip install --no-cache-dir -r requirements.txt && \
     chmod -R g+w /opt/app-root/lib/python3.11/site-packages
 
 # Copy application files
-COPY --chown=1001:0 app.py coco.yaml remote_infer_grpc.py grpc_predict_v2_pb2_grpc.py grpc_predict_v2_pb2.py grpc_predict_v2.proto ./
+# COPY --chown=1001:0 app.py coco.yaml remote_infer_grpc.py grpc_predict_v2_pb2_grpc.py grpc_predict_v2_pb2.py grpc_predict_v2.proto ./
+COPY --chown=1001:0 app.py coco.yaml remote_infer_rest.py ./
 
 # Expose Streamlit port
 EXPOSE 8501
