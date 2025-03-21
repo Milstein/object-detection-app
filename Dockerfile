@@ -1,5 +1,5 @@
 # Use a base image with Python
-FROM quay.io/fedora/python-311
+FROM quay.io/fedora/python-310
 
 # Set working directory
 WORKDIR /opt/app-root/src

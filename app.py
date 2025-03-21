@@ -1,60 +1,64 @@
-import os
 import cv2
 import numpy as np
-import streamlit as st
 from matplotlib import pyplot as plt
+import streamlit as st
+from remote_infer_rest import ort_v5
+import os
 from PIL import Image
 
-from remote_infer_rest import ort_v5
-
-# Constants
-MODEL_NAME = 'yolo'
-REST_URL = 'http://modelmesh-serving.nerc-demo-5b7ce1:8008'
-INFER_URL = f'{REST_URL}/v2/models/{MODEL_NAME}/infer'
-IMAGES_FOLDER = './images'  # Folder for storing user-uploaded images
-CONFIDENCE_THRESHOLD = 0.4
-IOU_THRESHOLD = 0.6
-INPUT_SIZE = 640
-CLASSES_FILE = 'coco.yaml'
+# Parameters
+model_name = 'yolo'
+rest_url = 'http://modelmesh-serving.nerc-demo-5b7ce1:8008'
+infer_url = f'{rest_url}/v2/models/{model_name}/infer'
+classes_file = 'coco.yaml'
+image_path = './images'
 
 # Ensure the "images" folder exists
-if not os.path.exists(IMAGES_FOLDER):
-    os.makedirs(IMAGES_FOLDER)
+if not os.path.exists(image_path):
+    os.makedirs(image_path)
 
-def draw_predictions(image_path, img, predictions):
-    """Draw bounding boxes on the image and display it."""
-    if predictions:
-        for det in predictions:
-            x1, y1, x2, y2, conf, class_idx = det
-            label = f"Class {int(class_idx)}: {conf:.2f}"
-            cv2.rectangle(img, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
-            cv2.putText(img, label, (int(x1), int(y1) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+# 1. Confidence threshold, between 0 and 1 (detections with less score won't be retained)
+conf = 0.4
 
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    plt.figure(figsize=(12, 6))
-    plt.axis('off')
-    plt.imshow(img)
-    plt.show()
+# 2. Intersection over Union Threshold, between 0 and 1 (cleanup overlapping boxes)
+iou = 0.6
 
-# Streamlit: File upload section
-st.title('YOLO Object Detection App')
+# Streamlit UI for image upload
+st.title("YOLO Object Detection")
+st.write("Upload an image to perform object detection using YOLO.")
 
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+# Allow the user to upload an image
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
 
 if uploaded_file is not None:
-    # Save uploaded image to the "images" folder
-    image_path = os.path.join(IMAGES_FOLDER, uploaded_file.name)
-    with open(image_path, "wb") as f:
+    # Save the uploaded file to the images directory
+    uploaded_image_path = os.path.join(image_path, uploaded_file.name)
+    with open(uploaded_image_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
+    
+    # Display the uploaded image
+    image = Image.open(uploaded_file)
+    st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    # Prepare and run the inference
-    infer = ort_v5(image_path, INFER_URL, CONFIDENCE_THRESHOLD, IOU_THRESHOLD, INPUT_SIZE, CLASSES_FILE)
-    img, predictions, result = infer()
+    # Run inference
+    infer = ort_v5(uploaded_image_path, infer_url, conf, iou, 640, classes_file)
+    img, out, result = infer()
 
-    if result:
-        st.write(f"Inference Result: {result}")
-        st.write('Predictions:')
-        st.write(predictions)
-        draw_predictions(image_path, img, predictions)
+    # Check if the predictions tensor is empty
+    if out.size(0) == 0:
+        st.write("No objects detected in the image.")
     else:
-        st.error("Error: No predictions received.")
+        st.write(f'{result}')
+        st.write('Predictions:')
+        st.write(out)
+        st.write('Format: each detection is a float64 array shaped as [top_left_corner_x, top_left_corner_y, bottom_right_corner_x, bottom_right_corner_y, confidence, class_index]')
+        st.write('The coordinates are relative to a letterboxed representation of the image of size 640x640')
+
+        # Process image and display it
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        fig = plt.gcf()
+        fig.set_size_inches(24, 12)
+        plt.axis('off')
+        plt.imshow(img)
+        st.pyplot(fig)
+
