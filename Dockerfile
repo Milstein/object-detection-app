@@ -1,7 +1,7 @@
 # Dockerfile
 FROM quay.io/fedora/python-310
 
-USER root
+USER 1001
 
 RUN dnf -y update && \
     dnf install -y mesa-libGL
