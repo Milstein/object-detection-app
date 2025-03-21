@@ -1,12 +1,14 @@
-streamlit
+streamlit==1.10.0
 opencv-python-headless  # Replaces opencv-python to avoid GUI dependencies in Docker
 matplotlib
 pillow
 numpy
-torch
+torch==1.13.1
 torchvision
 # grpcio
 # grpcio-tools
 pyyaml
 requests
 seaborn
+onnx
+onnxruntime

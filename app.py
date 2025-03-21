@@ -38,7 +38,7 @@ if uploaded_file is not None:
     
     # Display the uploaded image
     image = Image.open(uploaded_file)
-    st.image(image, caption="Uploaded Image", use_column_width=True)
+    st.image(image, caption="Uploaded Image", use_container_width=True)
 
     # Run inference
     infer = ort_v5(uploaded_image_path, infer_url, conf, iou, 640, classes_file)
