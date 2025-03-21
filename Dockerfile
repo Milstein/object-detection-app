@@ -5,8 +5,10 @@ FROM quay.io/fedora/python-310
 WORKDIR /opt/app-root/src
 
 # Create writable "images" folder for user uploads
-RUN mkdir /opt/app-root/src/images && \
+RUN mkdir -p /opt/app-root/src/images && \
     chmod -R 777 /opt/app-root/src/images
+
+COPY --chown=1001:0 images /opt/app-root/src/images
 
 # Copy necessary files
 COPY --chown=1001:0 requirements.txt ./
