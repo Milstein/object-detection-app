@@ -10,5 +10,5 @@ torchvision
 pyyaml
 requests
 seaborn
-onnx
-onnxruntime
+# onnx
+# onnxruntime
