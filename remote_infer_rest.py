@@ -223,7 +223,7 @@ class ort_v5:
 
     # Read classes
     def class_name(self):
-        with open(self.names, 'r') as f:
+        with open(self.names, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
         classes = [data['names'][i] for i in data['names']]
         return classes
