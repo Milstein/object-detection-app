@@ -1,6 +1,9 @@
 # Dockerfile
 FROM quay.io/fedora/python-310
 
+# Install the missing libraries
+RUN dnf install -y mesa-libGL
+
 # Set working directory
 WORKDIR /app
 
