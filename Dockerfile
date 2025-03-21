@@ -1,23 +1,23 @@
 # Dockerfile
-FROM quay.io/fedora/python-310
+FROM registry.access.redhat.com/ubi9/python-311
+
+# Set working directory
+WORKDIR /opt/app-root/src
 
 USER 1001
 
-RUN dnf -y update && \
-    dnf install -y mesa-libGL
-
-# Set working directory
-WORKDIR /app
+COPY --chown=1001:0 requirements.txt ./
 
 # Copy requirements and install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt && \
+    rm -f requirements.txt && \
+    # Fix permissions to support pip in Openshift environments \
+    chmod -R g+w /opt/app-root/lib/python3.11/site-packages && \
+    fix-permissions /opt/app-root -P
 
 # Copy application files
-COPY app.py .
-COPY coco.yaml .
-COPY remote_infer_grpc.py .
+COPY --chown=1001:0 app.py coco.yaml remote_infer_grpc.py ./
+# COPY --chown=1001:0 assets/ ./assets/
 
 # Expose Streamlit port
 EXPOSE 8501
