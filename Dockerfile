@@ -1,23 +1,33 @@
-# Dockerfile
 FROM registry.access.redhat.com/ubi9/python-311
 
 # Set working directory
 WORKDIR /opt/app-root/src
 
+# Switch to root to install system dependencies
+USER root
+
+# Install OpenGL-related dependencies
+RUN dnf install -y \
+    mesa-libGL \
+    mesa-dri-drivers \
+    libglvnd-glx \
+    libglvnd-opengl \
+    libX11 \
+    && dnf clean all
+
+# Switch back to non-root user for security
 USER 1001
 
+# Copy requirements and install dependencies
 COPY --chown=1001:0 requirements.txt ./
 
-# Copy requirements and install dependencies
 RUN pip install --no-cache-dir -r requirements.txt && \
     rm -f requirements.txt && \
-    # Fix permissions to support pip in Openshift environments \
     chmod -R g+w /opt/app-root/lib/python3.11/site-packages && \
     fix-permissions /opt/app-root -P
 
 # Copy application files
 COPY --chown=1001:0 app.py coco.yaml remote_infer_grpc.py ./
-# COPY --chown=1001:0 assets/ ./assets/
 
 # Expose Streamlit port
 EXPOSE 8501
