@@ -1,4 +1,5 @@
-FROM registry.access.redhat.com/ubi9/python-311
+# Use Fedora-based Python 3.11 image from Quay
+FROM quay.io/fedora/python-311
 
 # Set working directory
 WORKDIR /opt/app-root/src
@@ -18,13 +19,13 @@ RUN dnf install -y \
 # Switch back to non-root user for security
 USER 1001
 
-# Copy requirements and install dependencies
+# Copy Python dependencies
 COPY --chown=1001:0 requirements.txt ./
 
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt && \
     rm -f requirements.txt && \
-    chmod -R g+w /opt/app-root/lib/python3.11/site-packages && \
-    fix-permissions /opt/app-root -P
+    chmod -R g+w /opt/app-root/lib/python3.11/site-packages
 
 # Copy application files
 COPY --chown=1001:0 app.py coco.yaml remote_infer_grpc.py ./
